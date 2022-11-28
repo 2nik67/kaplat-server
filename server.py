@@ -4,7 +4,7 @@ import math
 app = Flask(__name__)
 host = "localhost"
 port = 8489
-stack = []
+stack = list()
 operations_with_two_numbers = ["plus", "minus", "times", "divide", "pow"]
 operations_with_one_number = ["abs", "fact"]
 
@@ -32,6 +32,19 @@ def calc(array_of_numbers, operation):
         return abs(int(array_of_numbers[0]))
     elif operation == "fact":
         return math.factorial(array_of_numbers[0])
+
+
+@app.route('/stack/size', methods=['GET'])
+def get_stack_size():
+    return str(len(stack))
+
+
+@app.route('/stack/arguments', methods=['PUT'])
+def add_arguments():
+    content = request.json
+    array_of_numbers = content['arguments']
+    for number in array_of_numbers:
+        stack.append(int(number))
 
 
 @app.route('/independent/calculate', methods=['POST'])
