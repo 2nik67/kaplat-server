@@ -36,7 +36,7 @@ def calc(array_of_numbers, operation):
 
 @app.route('/stack/size', methods=['GET'])
 def get_stack_size():
-    return str(len(stack))
+    return str(len(stack)), 200
 
 
 @app.route('/stack/arguments', methods=['PUT'])
@@ -44,7 +44,7 @@ def add_arguments():
     content = request.json
     array_of_numbers = content['arguments']
     for number in array_of_numbers:
-        stack.append(int(number))
+        stack.append(int(number)), 200
 
 
 @app.route('/independent/calculate', methods=['POST'])
@@ -70,16 +70,36 @@ def independent_calculation():
             return "Error: Too many arguments to perform the operation " + operation, 409
         elif operation == "factorial" and int(array_of_numbers[0]) < 0:
             return "Error while performing operation Factorial: not supported for the negative number", 409
+        else:
+            return str(calc(array_of_numbers, operation))
 
     else:
         return "Error: unknown operation: " + operation
 
 
-@app.route('/independent/calculate', methods=['GET'])
-def independent_calc2ulation():
-    return "Hey"
+@app.route('/stack/operate', methods=['GET'])
+def invoke_operation():
+    operation = request.args.get('operation').lower()
+
+    if operation in operations_with_two_numbers:
+        if len(stack) < 2:
+            return "Error: cannot implement operation" + operation + ". It requires 2 " \
+                   "arguments and the stack has only" + str(len(stack)) + "arguments", 409
+        else:
+            array_of_numbers = [stack.pop(), stack.pop()]
+            return str(calc(array_of_numbers, operation))
+
+    elif operation in operations_with_one_number:
+        if len(stack) < 1:
+            return "Error: cannot implement operation" + operation + ". It requires 1 " \
+                    "arguments and the stack has only" + str(len(stack)) + "arguments", 409
+        else:
+            array_of_numbers = [stack.pop()]
+            return str(calc(array_of_numbers, operation))
+
+    else:
+        return "Error: unknown operation: " + operation
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     app.run(host=host, port=port)
