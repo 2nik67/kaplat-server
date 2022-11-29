@@ -25,7 +25,7 @@ def calc(array_of_numbers, operation):
     elif operation == "times":
         return int(array_of_numbers[0]) * int(array_of_numbers[1])
     elif operation == "divide":
-        return int(array_of_numbers[0]) / int(array_of_numbers[1])
+        return int(int(array_of_numbers[0]) / int(array_of_numbers[1]))
     elif operation == "pow":
         return pow(int(array_of_numbers[0]), int(array_of_numbers[1]))
     elif operation == "abs":
@@ -44,7 +44,8 @@ def add_arguments():
     content = request.json
     array_of_numbers = content['arguments']
     for number in array_of_numbers:
-        stack.append(int(number)), 200
+        stack.append(int(number))
+    return str(len(stack)), 200
 
 
 @app.route('/independent/calculate', methods=['POST'])
@@ -80,11 +81,10 @@ def independent_calculation():
 @app.route('/stack/operate', methods=['GET'])
 def invoke_operation():
     operation = request.args.get('operation').lower()
-
     if operation in operations_with_two_numbers:
         if len(stack) < 2:
             return "Error: cannot implement operation" + operation + ". It requires 2 " \
-                   "arguments and the stack has only" + str(len(stack)) + "arguments", 409
+                    "arguments and the stack has only " + str(len(stack)) + " arguments", 409
         else:
             array_of_numbers = [stack.pop(), stack.pop()]
             return str(calc(array_of_numbers, operation))
@@ -98,7 +98,17 @@ def invoke_operation():
             return str(calc(array_of_numbers, operation))
 
     else:
-        return "Error: unknown operation: " + operation
+        return "Error: unknown operation: " + operation, 409
+
+
+@app.route('/stack/arguments', methods=['DELETE'])
+def delete_from_stack():
+    count = int(request.args.get('count'))
+    if len(stack) < count:
+        return "Error: cannot remove " + str(count) + " from the stack. It has only " + str(len(stack)) + " arguments", 409
+    for i in range(count):
+        stack.pop()
+    return str(len(stack)), 200
 
 
 if __name__ == '__main__':
