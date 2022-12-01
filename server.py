@@ -85,18 +85,21 @@ def invoke_operation():
         if len(stack) < 2:
             return "Error: cannot implement operation" + operation + ". It requires 2 " \
                     "arguments and the stack has only " + str(len(stack)) + " arguments", 409
+        array_of_numbers = [stack.pop(), stack.pop()]
+        if array_of_numbers[1] == 0 and operation == "divide":
+            return "Error while performing operation Divide: division by 0", 409
         else:
-            array_of_numbers = [stack.pop(), stack.pop()]
             return str(calc(array_of_numbers, operation))
 
     elif operation in operations_with_one_number:
         if len(stack) < 1:
             return "Error: cannot implement operation" + operation + ". It requires 1 " \
                     "arguments and the stack has only" + str(len(stack)) + "arguments", 409
+        array_of_numbers = [stack.pop()]
+        if array_of_numbers[0] < 0 and operation == "fact":
+            return "Error while performing operation Factorial: not supported for the negative number", 409
         else:
-            array_of_numbers = [stack.pop()]
             return str(calc(array_of_numbers, operation))
-
     else:
         return "Error: unknown operation: " + operation, 409
 
